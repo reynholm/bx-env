@@ -1,0 +1,128 @@
+##
+## https://github.com/sidigi/bitrix-docker/blob/master/docker-compose.yml
+## https://github.com/spiritabsolute/bitrix-env-dev/blob/master/docker-compose.yml
+##
+
+
+version: '2'
+
+services:
+
+  logs:
+    image: busybox
+    container_name: bx-logs
+    volumes:
+      - /var/log/mysql:/var/log/mysql
+      - /var/log/nginx:/var/log/nginx
+      - /var/log/php:/var/log/php-fpm
+
+  www:
+    image: busybox
+    container_name: bx-www
+    volumes:
+      - /home/reynholm/www:/var/www/public_html
+
+  modules:
+    image: busybox
+    container_name: bx-modules
+    volumes:
+      - /media/bitrix/modules:/media/bitrix/modules
+
+  mysql-data:
+    image: busybox
+    container_name: bx-mysql-data
+    volumes:
+      - /home/reynholm/mysql:/var/lib/mysql
+
+  memcache:
+    image: memcached:alpine
+    container_name: bx-memcache
+
+  redis:
+    image: redis
+
+  push-server-sub:
+    image: ikarpovich/bitrix-push-server
+    build:
+      context: ./push-server
+    links:
+      - redis:redis
+    environment:
+      - REDIS_HOST=redis
+      - LISTEN_HOSTNAME=b24.lan
+      - LISTEN_PORT=8895
+      - SECURITY_KEY=bx112112
+      - MODE=sub
+    ports:
+      - 8888:8895
+      - 8820:80
+
+  push-server-pub:
+    image: ikarpovich/bitrix-push-server
+    build:
+      context: ./push-server
+    links:
+      - redis:redis
+    environment:
+      - REDIS_HOST=redis
+      - LISTEN_HOSTNAME=b24.lan
+      - LISTEN_PORT=8895
+      - SECURITY_KEY=bx112112
+      - MODE=pub
+    ports:
+      - 8895:8895
+      - 8810:80
+
+  mysql:
+    image: percona:8
+    container_name: bx-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "112112"
+    ports:
+      - 3306:3306
+    volumes_from:
+      - mysql-data
+      - logs
+
+  php-fpm:
+    extends:
+      file: ./common-services.yml
+      service: server
+    build:
+      context: ./php-fpm
+      args:
+        - XDEBUG_IP="127.0.0.1"
+    container_name: bx-php-fpm
+    restart: always
+    volumes_from:
+      - www
+      - logs
+      - modules
+    links:
+      - mysql:mysql
+      - memcache:memcache
+      - push-server-pub:push-server-pub
+      - push-server-sub:push-server-sub
+
+  nginx:
+    extends:
+      file: ./common-services.yml
+      service: server
+    build:
+      context: ./nginx
+    ports:
+      - 80:80
+      - 443:443
+    container_name: bx-nginx
+    restart: always
+    volumes_from:
+      - www
+      - logs
+      - modules
+    volumes:
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled
+    #      - ./nginx/ssl:/var/www/ssl:ro
+    links:
+      - php-fpm:php-fpm
+    command: /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"

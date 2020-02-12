@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+
+  server:
+    build:
+      args:
+        - CONTAINER_UID=1000
+        - CONTAINER_GID=998
+        - CONTAINER_USER=bitrix
+        - CONTAINER_GROUP=bitrix
+    environment:
+      - CONTAINER_UID=1000
+      - CONTAINER_GID=998
+      - CONTAINER_USER=bitrix
+      - CONTAINER_GROUP=bitrix

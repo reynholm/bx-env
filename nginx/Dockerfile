@@ -1,0 +1,11 @@
+FROM nginx
+
+ARG CONTAINER_GID
+ARG CONTAINER_UID
+ARG CONTAINER_USER
+ARG CONTAINER_GROUP
+
+RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} && \
+    useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
+
+COPY ./nginx.conf /etc/nginx/nginx.conf.template
