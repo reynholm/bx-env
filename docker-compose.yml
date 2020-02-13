@@ -40,41 +40,41 @@ services:
 
   redis:
     image: redis
+    container_name: bx-redis
+    restart: always
 
   push-server-sub:
     image: ikarpovich/bitrix-push-server
+    container_name: bx-push-sub
+    restart: always
     build:
       context: ./push-server
     links:
       - redis:redis
     environment:
       - REDIS_HOST=redis
-      - LISTEN_HOSTNAME=b24.lan
+      - LISTEN_HOSTNAME=0.0.0.0
       - LISTEN_PORT=8895
       - SECURITY_KEY=bx112112
       - MODE=sub
-    ports:
-      - 8888:8895
-      - 8820:80
 
   push-server-pub:
     image: ikarpovich/bitrix-push-server
+    container_name: bx-push-pub
+    restart: always
     build:
       context: ./push-server
     links:
       - redis:redis
     environment:
       - REDIS_HOST=redis
-      - LISTEN_HOSTNAME=b24.lan
+      - LISTEN_HOSTNAME=0.0.0.0
       - LISTEN_PORT=8895
       - SECURITY_KEY=bx112112
       - MODE=pub
-    ports:
-      - 8895:8895
-      - 8810:80
 
   mysql:
-    image: percona:8
+    image: percona:5.7
     container_name: bx-mysql
     restart: always
     environment:
