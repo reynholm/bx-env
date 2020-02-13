@@ -74,7 +74,9 @@ services:
       - MODE=pub
 
   mysql:
-    image: percona:5.7
+#    image: percona:5.7
+    build:
+      context: ./mysql
     container_name: bx-mysql
     restart: always
     environment:
