@@ -37,6 +37,7 @@ services:
   memcache:
     image: memcached:alpine
     container_name: bx-memcache
+    restart: always
 
   redis:
     image: redis
