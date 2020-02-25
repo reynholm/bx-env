@@ -20,7 +20,7 @@ services:
     image: busybox
     container_name: bx-www
     volumes:
-      - /home/reynholm/www:/var/www/public_html
+      - /var/www/public_html:/var/www/public_html
 
   modules:
     image: busybox
@@ -32,7 +32,7 @@ services:
     image: busybox
     container_name: bx-mysql-data
     volumes:
-      - /home/reynholm/mysql:/var/lib/mysql
+      - /var/www/mysql:/var/lib/mysql
 
   memcache:
     image: memcached:alpine
