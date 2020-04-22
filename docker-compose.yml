@@ -6,6 +6,9 @@
 
 version: '2'
 
+volumes:
+  mysql_data:
+
 services:
 
   logs:
@@ -26,13 +29,7 @@ services:
     image: busybox
     container_name: bx-modules
     volumes:
-      - /media/bitrix/modules:/media/bitrix/modules
-
-  mysql-data:
-    image: busybox
-    container_name: bx-mysql-data
-    volumes:
-      - /var/www/mysql:/var/lib/mysql
+      - /media/bitrix/hg/modules:/media/bitrix/modules
 
   memcache:
     image: memcached:alpine
@@ -84,8 +81,9 @@ services:
       MYSQL_ROOT_PASSWORD: "112112"
     ports:
       - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
     volumes_from:
-      - mysql-data
       - logs
 
   php-fpm:
