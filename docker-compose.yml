@@ -52,9 +52,16 @@ services:
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
-      - LISTEN_PORT=8895
+      - LISTEN_PORT=8080
       - SECURITY_KEY=bx112112
       - MODE=sub
+    ports:
+      - 8080:8080
+    labels:
+      - traefik.port=8080
+      - traefik.protocol=http
+      - traefik.frontend.rule=Host:bx-sub.lan
+#      - traefik.docker.network=traefik-net
 
   push-server-pub:
     image: ikarpovich/bitrix-push-server
@@ -103,8 +110,8 @@ services:
     links:
       - mysql:mysql
       - memcache:memcache
-      - push-server-pub:push-server-pub
-      - push-server-sub:push-server-sub
+      - push-server-pub:bx-pub.lan
+      - push-server-sub:bx-sub.lan
 
   nginx:
     extends:
