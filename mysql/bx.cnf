@@ -1,2 +1,3 @@
 [mysqld]
-sql_mode=''
+sql_mode = ''
+innodb_strict_mode = OFF

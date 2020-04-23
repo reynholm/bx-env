@@ -35,11 +35,19 @@ services:
     image: memcached:alpine
     container_name: bx-memcache
     restart: always
+    networks:
+      bx:
+        aliases:
+          - memcache
 
   redis:
     image: redis
     container_name: bx-redis
     restart: always
+    networks:
+      bx:
+        aliases:
+          - redis
 
   push-server-sub:
     image: ikarpovich/bitrix-push-server
@@ -47,8 +55,6 @@ services:
     restart: always
     build:
       context: ./push-server
-    links:
-      - redis:redis
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
@@ -61,7 +67,10 @@ services:
       - traefik.port=8080
       - traefik.protocol=http
       - traefik.frontend.rule=Host:bx-sub.lan
-#      - traefik.docker.network=traefik-net
+    networks:
+      bx:
+        aliases:
+          - bx-sub.lan
 
   push-server-pub:
     image: ikarpovich/bitrix-push-server
@@ -69,17 +78,18 @@ services:
     restart: always
     build:
       context: ./push-server
-    links:
-      - redis:redis
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
       - LISTEN_PORT=8895
       - SECURITY_KEY=bx112112
       - MODE=pub
+    networks:
+      bx:
+        aliases:
+          - bx-pub.lan
 
   mysql:
-#    image: percona:5.7
     build:
       context: ./mysql
     container_name: bx-mysql
@@ -92,6 +102,10 @@ services:
       - mysql_data:/var/lib/mysql
     volumes_from:
       - logs
+    networks:
+      bx:
+        aliases:
+          - mysql
 
   php-fpm:
     extends:
@@ -107,11 +121,10 @@ services:
       - www
       - logs
       - modules
-    links:
-      - mysql:mysql
-      - memcache:memcache
-      - push-server-pub:bx-pub.lan
-      - push-server-sub:bx-sub.lan
+    networks:
+      bx:
+        aliases:
+          - php-fpm
 
   nginx:
     extends:
@@ -131,6 +144,11 @@ services:
     volumes:
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled
     #      - ./nginx/ssl:/var/www/ssl:ro
-    links:
-      - php-fpm:php-fpm
     command: /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+    networks:
+      bx:
+        aliases:
+          - b24.lan
+
+networks:
+  bx:
