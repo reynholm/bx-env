@@ -7,6 +7,8 @@ ARG CONTAINER_UID
 ARG CONTAINER_USER
 ARG CONTAINER_GROUP
 
+ARG XDEBUG_IP
+
 COPY ./conf.d /usr/local/etc/php/conf.d/
 COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
 COPY ./exim/update-exim4.conf.conf /etc/exim4/
