@@ -6,6 +6,9 @@
 
 version: '2'
 
+volumes:
+  mysql_data:
+
 services:
 
   logs:
@@ -20,29 +23,31 @@ services:
     image: busybox
     container_name: bx-www
     volumes:
-      - /home/reynholm/www:/var/www/public_html
+      - /var/www/public_html:/var/www/public_html
 
   modules:
     image: busybox
     container_name: bx-modules
     volumes:
-      - /media/bitrix/modules:/media/bitrix/modules
-
-  mysql-data:
-    image: busybox
-    container_name: bx-mysql-data
-    volumes:
-      - /home/reynholm/mysql:/var/lib/mysql
+      - /media/bitrix/hg/modules:/media/bitrix/modules
 
   memcache:
     image: memcached:alpine
     container_name: bx-memcache
     restart: always
+    networks:
+      bx:
+        aliases:
+          - memcache
 
   redis:
     image: redis
     container_name: bx-redis
     restart: always
+    networks:
+      bx:
+        aliases:
+          - redis
 
   push-server-sub:
     image: ikarpovich/bitrix-push-server
@@ -50,14 +55,22 @@ services:
     restart: always
     build:
       context: ./push-server
-    links:
-      - redis:redis
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
-      - LISTEN_PORT=8895
+      - LISTEN_PORT=8080
       - SECURITY_KEY=bx112112
       - MODE=sub
+    ports:
+      - 8080:8080
+    labels:
+      - traefik.port=8080
+      - traefik.protocol=http
+      - traefik.frontend.rule=Host:bx-sub.lan
+    networks:
+      bx:
+        aliases:
+          - bx-sub.lan
 
   push-server-pub:
     image: ikarpovich/bitrix-push-server
@@ -65,17 +78,18 @@ services:
     restart: always
     build:
       context: ./push-server
-    links:
-      - redis:redis
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
       - LISTEN_PORT=8895
       - SECURITY_KEY=bx112112
       - MODE=pub
+    networks:
+      bx:
+        aliases:
+          - bx-pub.lan
 
   mysql:
-#    image: percona:5.7
     build:
       context: ./mysql
     container_name: bx-mysql
@@ -84,9 +98,14 @@ services:
       MYSQL_ROOT_PASSWORD: "112112"
     ports:
       - 3306:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
     volumes_from:
-      - mysql-data
       - logs
+    networks:
+      bx:
+        aliases:
+          - mysql
 
   php-fpm:
     extends:
@@ -102,11 +121,10 @@ services:
       - www
       - logs
       - modules
-    links:
-      - mysql:mysql
-      - memcache:memcache
-      - push-server-pub:push-server-pub
-      - push-server-sub:push-server-sub
+    networks:
+      bx:
+        aliases:
+          - php-fpm
 
   nginx:
     extends:
@@ -126,6 +144,11 @@ services:
     volumes:
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled
     #      - ./nginx/ssl:/var/www/ssl:ro
-    links:
-      - php-fpm:php-fpm
     command: /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+    networks:
+      bx:
+        aliases:
+          - b24.lan
+
+networks:
+  bx:

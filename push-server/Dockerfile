@@ -2,7 +2,8 @@ FROM centos:7 as bitrixenv
 
 WORKDIR /build
 ADD build.sh /build
-RUN /build/build.sh
+RUN chmod +x /build/build.sh && \
+    /build/build.sh
 
 FROM node:8-alpine
 
@@ -19,6 +20,7 @@ RUN set -x && \
     apk del build_deps
 
 ADD run.sh /opt/push-server
+RUN chmod +x /opt/push-server/run.sh
 ADD config.template.json /etc/push-server/
 
 ENV LISTEN_PORT 8010
