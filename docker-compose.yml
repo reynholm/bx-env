@@ -11,25 +11,17 @@ volumes:
 
 services:
 
-  logs:
-    image: busybox
-    container_name: bx-logs
-    volumes:
-      - /var/log/mysql:/var/log/mysql
-      - /var/log/nginx:/var/log/nginx
-      - /var/log/php:/var/log/php-fpm
-
   www:
     image: busybox
     container_name: bx-www
     volumes:
-      - /var/www/public_html:/var/www/public_html
+      - /var/www/bitrix/public_html:/var/www/public_html
 
   modules:
     image: busybox
     container_name: bx-modules
     volumes:
-      - /media/bitrix/hg/modules:/media/bitrix/modules
+      - /var/www/bitrix/modules:/media/bitrix/modules
 
   memcache:
     image: memcached:alpine
@@ -100,8 +92,7 @@ services:
       - 3306:3306
     volumes:
       - mysql_data:/var/lib/mysql
-    volumes_from:
-      - logs
+      - ../logs/mysql:/var/log/mysql
     networks:
       bx:
         aliases:
@@ -117,9 +108,10 @@ services:
         - XDEBUG_IP="127.0.0.1"
     container_name: bx-php-fpm
     restart: always
+    volumes:
+      - ../logs/php-fpm:/var/log/php-fpm
     volumes_from:
       - www
-      - logs
       - modules
     networks:
       bx:
@@ -139,10 +131,10 @@ services:
     restart: always
     volumes_from:
       - www
-      - logs
       - modules
     volumes:
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled
+      - ../logs/nginx:/var/log/nginx
     #      - ./nginx/ssl:/var/www/ssl:ro
     command: /bin/bash -c "envsubst < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
     networks:
