@@ -1,14 +1,14 @@
 server {
-    listen 80 default_server;
+    listen 80 %DEFAULT%;
 
-    server_name b24.lan;
-    root /var/www/public_html/b24;
+    server_name %NAME%.lan;
+    root /var/www/public_html/%NAME%;
     index index.php index.html;
 
     client_max_body_size 1024m;
 
-    access_log /var/log/nginx/access.log;
-    error_log /var/log/nginx/error.log;
+    access_log /var/log/nginx/access-%NAME%.log;
+    error_log /var/log/nginx/error-%NAME%.log;
 
     if (!-e $request_filename) {
        rewrite  ^(.*)$  /bitrix/urlrewrite.php last;

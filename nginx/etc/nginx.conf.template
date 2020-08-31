@@ -37,5 +37,6 @@ http {
     open_file_cache_min_uses 2;
     open_file_cache_errors on;
 
+    include  /etc/nginx/conf.d/*.conf;
     include  /etc/nginx/sites-enabled/*.conf;
 }
