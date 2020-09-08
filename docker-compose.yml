@@ -15,13 +15,13 @@ services:
     image: busybox
     container_name: bx-www
     volumes:
-      - /var/www/bitrix/public_html:/var/www/public_html
+      - /var/www/public_html:/var/www/public_html
 
   modules:
     image: busybox
     container_name: bx-modules
     volumes:
-      - /var/www/bitrix/modules:/media/bitrix/modules
+      - /media/bitrix/hg/modules:/media/bitrix/modules
 
   memcache:
     image: memcached:alpine

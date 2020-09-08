@@ -2,7 +2,8 @@ server {
     listen 80 %DEFAULT%;
 
     server_name %NAME%.lan;
-    root /var/www/public_html/%NAME%;
+    set $docroot /var/www/public_html/%NAME%;
+    root $docroot;
     index index.php index.html;
 
     client_max_body_size 1024m;
@@ -14,22 +15,46 @@ server {
        rewrite  ^(.*)$  /bitrix/urlrewrite.php last;
     }
 
-    location / {
-        if (-f $document_root/index.php) {
-            break;
-        }
+    # Settings BX_TEMPORARY_FILES_DIRECTORY
+    location ~* ^/bx_tmp_download/ {
+        internal;
+        rewrite /bx_tmp_download/(.+) /.bx_temp/default/$1 last;
     }
 
-    location @bitrix {
-        fastcgi_pass php-upstream;
-        include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root/bitrix/urlrewrite.php;
+    location ~* ^/.bx_temp/default/ {
+        internal;
+        root /var/www/public_html;
     }
 
+    # cache condition variable
+    set $usecache "";
+    if ($is_global_cache = 1) { set $usecache "${usecache}A"; }
+
+    # Cache location: composite and general site
+    location ~* @.*\.html$ {
+        internal;
+        # disable browser cache, php manage file
+        expires -1y;
+        add_header X-Bitrix-Composite "Nginx (file)";
+    }
+
+    # Player options, disable no-sniff
+    location ~* ^/bitrix/components/bitrix/player/mediaplayer/player$ {
+        add_header Access-Control-Allow-Origin *;
+    }
+
+    # php file processing
     location ~ \.php$ {
-        if (!-f $request_filename) {
-          rewrite  ^(.*)/index.php$  $1/ redirect;
-        }
+
+        set $cache_file "bitrix/html_pages$general_key@$args.html";
+
+        # test file conditions
+        if (-f "$docroot/bitrix/html_pages/.enabled") { set $usecache "${usecache}B"; }
+        if (-f "$docroot/$cache_file")                { set $usecache "${usecache}C"; }
+
+        # create rewrite if cache-file exists
+        if ($usecache = "ABC" ) { rewrite .* /$cache_file last; }
+
         include fastcgi_params;
         fastcgi_pass php-upstream;
         fastcgi_index index.php;
@@ -38,15 +63,17 @@ server {
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
     }
 
-    location = /restore.php {
-        include fastcgi_params;
-        fastcgi_pass php-upstream;
-        fastcgi_index index.php;
-        fastcgi_send_timeout 21600;
-        fastcgi_read_timeout 21600;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        client_body_buffer_size 1024m;
-        client_max_body_size 1024m;
+    # directories page processing
+    location ~ /$ {
+
+        set $cache_file "bitrix/html_pages$general_key/index@$args.html";
+
+        # test file conditions
+        if (-f "$docroot/bitrix/html_pages/.enabled") { set $usecache "${usecache}B"; }
+        if (-f "$docroot/$cache_file")                { set $usecache "${usecache}C"; }
+
+        # create rewrite if cache-file exists
+        if ($usecache = "ABC" ) { rewrite .* /$cache_file last; }
     }
 
     location ~ /upload/ {
