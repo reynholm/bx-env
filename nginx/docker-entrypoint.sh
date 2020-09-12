@@ -19,7 +19,7 @@ do
 
   TEMPLATE="${BX_WORKDIR}/${BX_TEMPLATE}"
 
-  [[ ${f} =~ "." ]] && HOST=${f} || HOST="${f}.${BX_DEFAULT_LOCAL_DOMAIN}"
+  [[ ${f} =~ "." || ${BX_DEFAULT_LOCAL_DOMAIN} == '' ]] && HOST=${f} || HOST="${f}.${BX_DEFAULT_LOCAL_DOMAIN}"
   [[ ${HOST} == ${BX_DEFAULT_HOST} ]] && DEFAULT=" default_server" || DEFAULT=""
 
   touch "${OUTPUT}" && sed -e "s/%HOST%/${HOST}/; s/%NAME%/${f}/; s/%DEFAULT%/${DEFAULT}/" "${TEMPLATE}" > ${OUTPUT}

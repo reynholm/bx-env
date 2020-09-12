@@ -58,11 +58,11 @@ services:
     labels:
       - traefik.port=${BX_PUSH_SUB_PORT}
       - traefik.protocol=http
-      - traefik.frontend.rule=Host:${BX_PUSH_SUB_URL}
+      - traefik.frontend.rule=Host:${BX_PUSH_SUB_HOST}
     networks:
       bx:
         aliases:
-          - ${BX_PUSH_SUB_URL}
+          - ${BX_PUSH_SUB_HOST}
 
   push-server-pub:
     image: ikarpovich/bitrix-push-server
@@ -79,7 +79,7 @@ services:
     networks:
       bx:
         aliases:
-          - ${BX_PUSH_PUB_URL}
+          - ${BX_PUSH_PUB_HOST}
 
   mysql:
     build:
