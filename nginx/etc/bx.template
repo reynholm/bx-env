@@ -1,7 +1,7 @@
 server {
-    listen 80 %DEFAULT%;
+    listen 80;
 
-    server_name %NAME%.lan;
+    server_name %HOST%%DEFAULT%;
     set $docroot /var/www/public_html/%NAME%;
     root $docroot;
     index index.php index.html;

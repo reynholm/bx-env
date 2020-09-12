@@ -15,13 +15,13 @@ services:
     image: busybox
     container_name: bx-www
     volumes:
-      - /var/www/public_html:/var/www/public_html
+      - ${BX_PUBLIC_HTML_PATH}:/var/www/public_html
 
   modules:
     image: busybox
     container_name: bx-modules
     volumes:
-      - /media/bitrix/hg/modules:/media/bitrix/modules
+      - ${BX_MODULES_PATH}:/media/bitrix/modules
 
   memcache:
     image: memcached:alpine
@@ -50,19 +50,19 @@ services:
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
-      - LISTEN_PORT=8080
-      - SECURITY_KEY=bx112112
+      - LISTEN_PORT=${BX_PUSH_SUB_PORT}
+      - SECURITY_KEY=${BX_PUSH_SECURITY_KEY}
       - MODE=sub
     ports:
       - 8080:8080
     labels:
-      - traefik.port=8080
+      - traefik.port=${BX_PUSH_SUB_PORT}
       - traefik.protocol=http
-      - traefik.frontend.rule=Host:bx-sub.lan
+      - traefik.frontend.rule=Host:${BX_PUSH_SUB_URL}
     networks:
       bx:
         aliases:
-          - bx-sub.lan
+          - ${BX_PUSH_SUB_URL}
 
   push-server-pub:
     image: ikarpovich/bitrix-push-server
@@ -73,13 +73,13 @@ services:
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
-      - LISTEN_PORT=8895
-      - SECURITY_KEY=bx112112
+      - LISTEN_PORT=${BX_PUSH_PUB_PORT}
+      - SECURITY_KEY=${BX_PUSH_SECURITY_KEY}
       - MODE=pub
     networks:
       bx:
         aliases:
-          - bx-pub.lan
+          - ${BX_PUSH_PUB_URL}
 
   mysql:
     build:
@@ -87,12 +87,12 @@ services:
     container_name: bx-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "112112"
+      MYSQL_ROOT_PASSWORD: "${BX_MYSQL_ROOT_PASSWORD}"
     ports:
       - 3306:3306
     volumes:
       - mysql_data:/var/lib/mysql
-      - ../logs/mysql:/var/log/mysql
+      - ${BX_LOGS_PATH}/mysql:/var/log/mysql
     networks:
       bx:
         aliases:
@@ -105,11 +105,11 @@ services:
     build:
       context: ./php-fpm
       args:
-        - XDEBUG_IP="127.0.0.1"
+        - XDEBUG_IP="${BX_XDEBUG_IP}"
     container_name: bx-php-fpm
     restart: always
     volumes:
-      - ../logs/php-fpm:/var/log/php-fpm
+      - ${BX_LOGS_PATH}/php-fpm:/var/log/php-fpm
     volumes_from:
       - www
       - modules
@@ -129,15 +129,18 @@ services:
       - 443:443
     container_name: bx-nginx
     restart: always
+    environment:
+      - BX_DEFAULT_HOST=${BX_DEFAULT_HOST}
+      - BX_DEFAULT_LOCAL_DOMAIN=${BX_DEFAULT_LOCAL_DOMAIN}
     volumes_from:
       - www
       - modules
     volumes:
-      - ../logs/nginx:/var/log/nginx
+      - ${BX_LOGS_PATH}/nginx:/var/log/nginx
     networks:
       bx:
         aliases:
-          - b24.lan
+          - nginx
 
 networks:
   bx:
