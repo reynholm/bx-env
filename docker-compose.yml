@@ -11,16 +11,11 @@ volumes:
 
 services:
 
-  www:
+  mounts:
     image: busybox
     container_name: bx-www
     volumes:
       - ${BX_PUBLIC_HTML_PATH}:/var/www/public_html
-
-  modules:
-    image: busybox
-    container_name: bx-modules
-    volumes:
       - ${BX_MODULES_PATH}:/media/bitrix/modules
 
   memcache:
@@ -54,7 +49,7 @@ services:
       - SECURITY_KEY=${BX_PUSH_SECURITY_KEY}
       - MODE=sub
     ports:
-      - 8080:8080
+      - ${BX_PUSH_SUB_PORT}:${BX_PUSH_SUB_PORT}
     labels:
       - traefik.port=${BX_PUSH_SUB_PORT}
       - traefik.protocol=http
@@ -111,8 +106,7 @@ services:
     volumes:
       - ${BX_LOGS_PATH}/php-fpm:/var/log/php-fpm
     volumes_from:
-      - www
-      - modules
+      - mounts
     networks:
       bx:
         aliases:
@@ -133,8 +127,7 @@ services:
       - BX_DEFAULT_HOST=${BX_DEFAULT_HOST}
       - BX_DEFAULT_LOCAL_DOMAIN=${BX_DEFAULT_LOCAL_DOMAIN}
     volumes_from:
-      - www
-      - modules
+      - mounts
     volumes:
       - ${BX_LOGS_PATH}/nginx:/var/log/nginx
     networks:
