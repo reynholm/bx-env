@@ -126,6 +126,7 @@ services:
     environment:
       - BX_DEFAULT_HOST=${BX_DEFAULT_HOST}
       - BX_DEFAULT_LOCAL_DOMAIN=${BX_DEFAULT_LOCAL_DOMAIN}
+      - BX_HOST_AUTOCREATE=${BX_HOST_AUTOCREATE}
     volumes_from:
       - mounts
     volumes:
