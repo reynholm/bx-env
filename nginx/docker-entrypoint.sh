@@ -12,7 +12,7 @@ if [[ ${BX_HOST_AUTOCREATE} == 1 ]]; then
 
   cd ${WWW_DIR} || exit
 
-  [[ ! (-d "${BX_WORKDIR}/${BX_TARGETDIR}") ]] && mkdir -p "${BX_WORKDIR}/${BX_TARGETDIR}" || exit
+  [[ ! (-d "${BX_WORKDIR}/${BX_TARGETDIR}") ]] && mkdir -p "${BX_WORKDIR}/${BX_TARGETDIR}"
 
   for f in *
   do
