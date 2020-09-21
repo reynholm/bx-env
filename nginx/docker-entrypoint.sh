@@ -18,13 +18,13 @@ if [[ ${BX_HOST_AUTOCREATE} == 1 ]]; then
   do
     [[ ! (-d ${f}) ]] && continue
 
-    OUTPUT="${BX_WORKDIR}/${BX_TARGETDIR}/${f}.conf"
-    [[ -f ${OUTPUT} ]] && continue
-
     TEMPLATE="${BX_WORKDIR}/${BX_TEMPLATE}"
 
     [[ ${f} =~ "." || ${BX_DEFAULT_LOCAL_DOMAIN} == '' ]] && HOST=${f} || HOST="${f}.${BX_DEFAULT_LOCAL_DOMAIN}"
     [[ ${HOST} == ${BX_DEFAULT_HOST} ]] && DEFAULT=" default_server" || DEFAULT=""
+
+    OUTPUT="${BX_WORKDIR}/${BX_TARGETDIR}/${HOST}.conf"
+    [[ -f ${OUTPUT} ]] && continue
 
     touch "${OUTPUT}" && sed -e "s/%HOST%/${HOST}/; s/%NAME%/${f}/; s/%DEFAULT%/${DEFAULT}/" "${TEMPLATE}" > ${OUTPUT}
   done
