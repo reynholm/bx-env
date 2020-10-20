@@ -79,10 +79,13 @@ services:
   mysql:
     build:
       context: ./mysql
+      args:
+        - BX_MYSQL_IMAGE=${BX_MYSQL_IMAGE}
     container_name: bx-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "${BX_MYSQL_ROOT_PASSWORD}"
+      - MYSQL_ROOT_PASSWORD=${BX_MYSQL_ROOT_PASSWORD}
+      - BX_MYSQL_IMAGE=${BX_MYSQL_IMAGE}
     ports:
       - 3306:3306
     volumes:
