@@ -46,7 +46,6 @@ RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} && \
 RUN chmod -R 777 /usr/local/etc/php/ && \
     chown -R ${CONTAINER_USER} /usr/local/etc/php/ && \
     curl -sS https://getcomposer.org/installer | php ; mv composer.phar /usr/bin/composer && \
-    composer global require "fxp/composer-asset-plugin:@stable" && \
     update-exim4.conf -v
 
 RUN sed -i "1 a xdebug.remote_host="${XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini
