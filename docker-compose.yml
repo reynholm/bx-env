@@ -110,6 +110,8 @@ services:
       - ${BX_LOGS_PATH}/php-fpm:/var/log/php-fpm
     volumes_from:
       - mounts
+    extra_hosts:
+      - ${BX_UPDATE_HOST}
     networks:
       bx:
         aliases:
