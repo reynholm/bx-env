@@ -38,8 +38,25 @@
 **BX_MYSQL_ROOT_PASSWORD**  
 пароль для root пользователя mysql  
 
+**BX_MYSQL_PORT**  
+порт на котором mysql будет доступен извне, по умолчанию 3306  
+
 **BX_XDEBUG_IP**  
-устанавливает опцию xdebug.remote_host  
+устанавливает опцию xdebug.client_host  
+
+**BX_XDEBUG_PORT**  
+устанавливает опцию xdebug.client_port  
+
+**BX_DEFAULT_CHARSET**  
+кодировка по умолчанию для php  
+
+**BX_HTTP_PORT**  
+**BX_HTTPS_PORT**  
+порты на которых будет доступен веб сервер
+
+**BX_CONTAINER_UID**  
+**BX_CONTAINER_GID**  
+пользователь и группа от имени которого будут работать php и nginx
 
 **BX_UPDATE_HOST**  
 добавляет указанную строку в extra_hosts директиву docker-compose конфига (затем попадет в /etc/hosts php контейнера)  
