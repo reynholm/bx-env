@@ -8,6 +8,7 @@ ARG CONTAINER_USER
 ARG CONTAINER_GROUP
 
 ARG BX_XDEBUG_IP
+ARG BX_XDEBUG_PORT
 ARG BX_DEFAULT_CHARSET
 
 COPY ./conf.d /usr/local/etc/php/conf.d/
@@ -39,7 +40,7 @@ RUN apt-get update \
 #    && pecl install -o -f redis \
 #    && docker-php-ext-enable redis \
     && rm -rf /tmp/* /var/cache/apk/* /var/lib/apt/lists/* \
-    && pecl install xdebug-2.9.8 && docker-php-ext-enable xdebug
+    && pecl install xdebug && docker-php-ext-enable xdebug
 
 RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} \
     && useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
@@ -49,7 +50,8 @@ RUN chmod -R 777 /usr/local/etc/php/ \
     && curl -sS https://getcomposer.org/installer | php ; mv composer.phar /usr/bin/composer \
     && update-exim4.conf -v
 
-RUN sed -i "$ a xdebug.remote_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini \
+RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini \
+    && sed -i "$ a xdebug.client_port="${BX_XDEBUG_PORT} /usr/local/etc/php/conf.d/xdebug.ini \
     && sed -i "$ a default_charset="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/php.ini \
     && sed -i "$ a mbstring.internal_encoding="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/mbstring.ini
 

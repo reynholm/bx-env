@@ -104,6 +104,7 @@ services:
       context: ./php-fpm
       args:
         - BX_XDEBUG_IP=${BX_XDEBUG_IP}
+        - BX_XDEBUG_PORT=${BX_XDEBUG_PORT}
         - BX_DEFAULT_CHARSET=${BX_DEFAULT_CHARSET}
     container_name: bx-php-fpm
     restart: always
