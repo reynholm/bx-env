@@ -103,7 +103,8 @@ services:
     build:
       context: ./php-fpm
       args:
-        - XDEBUG_IP="${BX_XDEBUG_IP}"
+        - BX_XDEBUG_IP=${BX_XDEBUG_IP}
+        - BX_DEFAULT_CHARSET=${BX_DEFAULT_CHARSET}
     container_name: bx-php-fpm
     restart: always
     volumes:

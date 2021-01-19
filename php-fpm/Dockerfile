@@ -7,7 +7,8 @@ ARG CONTAINER_UID
 ARG CONTAINER_USER
 ARG CONTAINER_GROUP
 
-ARG XDEBUG_IP
+ARG BX_XDEBUG_IP
+ARG BX_DEFAULT_CHARSET
 
 COPY ./conf.d /usr/local/etc/php/conf.d/
 COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
@@ -40,14 +41,16 @@ RUN apt-get update \
     && rm -rf /tmp/* /var/cache/apk/* /var/lib/apt/lists/* \
     && pecl install xdebug-2.9.8 && docker-php-ext-enable xdebug
 
-RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} && \
-    useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
+RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} \
+    && useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
 
-RUN chmod -R 777 /usr/local/etc/php/ && \
-    chown -R ${CONTAINER_USER} /usr/local/etc/php/ && \
-    curl -sS https://getcomposer.org/installer | php ; mv composer.phar /usr/bin/composer && \
-    update-exim4.conf -v
+RUN chmod -R 777 /usr/local/etc/php/ \
+    && chown -R ${CONTAINER_USER} /usr/local/etc/php/ \
+    && curl -sS https://getcomposer.org/installer | php ; mv composer.phar /usr/bin/composer \
+    && update-exim4.conf -v
 
-RUN sed -i "1 a xdebug.remote_host="${XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini
+RUN sed -i "$ a xdebug.remote_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini \
+    && sed -i "$ a default_charset="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/php.ini \
+    && sed -i "$ a mbstring.internal_encoding="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/mbstring.ini
 
 ENTRYPOINT php-fpm -F

@@ -5,12 +5,12 @@ services:
   server:
     build:
       args:
-        - CONTAINER_UID=1000
-        - CONTAINER_GID=1000
-        - CONTAINER_USER=bitrix
-        - CONTAINER_GROUP=bitrix
+        - CONTAINER_UID=${BX_CONTAINER_UID}
+        - CONTAINER_GID=${BX_CONTAINER_GID}
+        - CONTAINER_USER=bx
+        - CONTAINER_GROUP=bx
     environment:
-      - CONTAINER_UID=1000
-      - CONTAINER_GID=1000
-      - CONTAINER_USER=bitrix
-      - CONTAINER_GROUP=bitrix
+      - CONTAINER_UID=${BX_CONTAINER_UID}
+      - CONTAINER_GID=${BX_CONTAINER_GID}
+      - CONTAINER_USER=bx
+      - CONTAINER_GROUP=bx
