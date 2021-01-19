@@ -87,7 +87,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${BX_MYSQL_ROOT_PASSWORD}
       - BX_MYSQL_IMAGE=${BX_MYSQL_IMAGE}
     ports:
-      - 3306:3306
+      - ${BX_MYSQL_PORT}:3306
     volumes:
       - mysql_data:/var/lib/mysql
       - ${BX_LOGS_PATH}/mysql:/var/log/mysql
@@ -125,8 +125,8 @@ services:
     build:
       context: ./nginx
     ports:
-      - 80:80
-      - 443:443
+      - ${BX_HTTP_PORT}:80
+      - ${BX_HTTPS_PORT}:443
     container_name: bx-nginx
     restart: always
     environment:
