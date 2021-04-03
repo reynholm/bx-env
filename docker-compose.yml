@@ -1,22 +1,7 @@
-##
-## https://github.com/sidigi/bitrix-docker/blob/master/docker-compose.yml
-## https://github.com/spiritabsolute/bitrix-env-dev/blob/master/docker-compose.yml
-##
 
-
-version: '2'
-
-volumes:
-  mysql_data:
+version: '3.8'
 
 services:
-
-  mounts:
-    image: busybox
-    container_name: bx-www
-    volumes:
-      - ${BX_PUBLIC_HTML_PATH}:/var/www/public_html
-      - ${BX_MODULES_PATH}:/media/bitrix/modules
 
   memcache:
     image: memcached:alpine
@@ -97,21 +82,27 @@ services:
           - mysql
 
   php-fpm:
-    extends:
-      file: ./common-services.yml
-      service: server
     build:
       context: ./php-fpm
       args:
         - BX_XDEBUG_IP=${BX_XDEBUG_IP}
         - BX_XDEBUG_PORT=${BX_XDEBUG_PORT}
         - BX_DEFAULT_CHARSET=${BX_DEFAULT_CHARSET}
+        - CONTAINER_UID=${BX_CONTAINER_UID}
+        - CONTAINER_GID=${BX_CONTAINER_GID}
+        - CONTAINER_USER=bx
+        - CONTAINER_GROUP=bx
     container_name: bx-php-fpm
     restart: always
+    environment:
+      - CONTAINER_UID=${BX_CONTAINER_UID}
+      - CONTAINER_GID=${BX_CONTAINER_GID}
+      - CONTAINER_USER=bx
+      - CONTAINER_GROUP=bx
     volumes:
       - ${BX_LOGS_PATH}/php-fpm:/var/log/php-fpm
-    volumes_from:
-      - mounts
+      - bx-public:/var/www/public_html
+      - bx-modules:/media/bitrix/modules
     extra_hosts:
       - ${BX_UPDATE_HOST}
     networks:
@@ -120,11 +111,13 @@ services:
           - php-fpm
 
   nginx:
-    extends:
-      file: ./common-services.yml
-      service: server
     build:
       context: ./nginx
+      args:
+        - CONTAINER_UID=${BX_CONTAINER_UID}
+        - CONTAINER_GID=${BX_CONTAINER_GID}
+        - CONTAINER_USER=bx
+        - CONTAINER_GROUP=bx
     ports:
       - ${BX_HTTP_PORT}:80
       - ${BX_HTTPS_PORT}:443
@@ -134,10 +127,14 @@ services:
       - BX_DEFAULT_HOST=${BX_DEFAULT_HOST}
       - BX_DEFAULT_LOCAL_DOMAIN=${BX_DEFAULT_LOCAL_DOMAIN}
       - BX_HOST_AUTOCREATE=${BX_HOST_AUTOCREATE}
-    volumes_from:
-      - mounts
+      - CONTAINER_UID=${BX_CONTAINER_UID}
+      - CONTAINER_GID=${BX_CONTAINER_GID}
+      - CONTAINER_USER=bx
+      - CONTAINER_GROUP=bx
     volumes:
       - ${BX_LOGS_PATH}/nginx:/var/log/nginx
+      - bx-public:/var/www/public_html
+      - bx-modules:/media/bitrix/modules
     networks:
       bx:
         aliases:
@@ -145,3 +142,18 @@ services:
 
 networks:
   bx:
+
+volumes:
+  mysql_data:
+  bx-modules:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${BX_MODULES_PATH}
+  bx-public:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${BX_PUBLIC_HTML_PATH}
