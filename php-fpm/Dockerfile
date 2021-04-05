@@ -1,6 +1,6 @@
-FROM php:7.3-fpm
+FROM php:7.4-fpm
 
-ARG APCU_VERSION=5.1.18
+ARG APCU_VERSION=5.1.20
 
 ARG CONTAINER_GID
 ARG CONTAINER_UID
@@ -33,7 +33,7 @@ RUN apt-get update \
     && docker-php-ext-enable imagick \
     && docker-php-ext-enable apcu \
     && docker-php-ext-enable memcached \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install mysqli pdo_mysql opcache exif intl sockets bz2 zip \
     && docker-php-ext-configure opcache --enable-opcache \
