@@ -83,7 +83,7 @@ services:
 
   php-fpm:
     build:
-      context: ./php-fpm
+      context: ./php${BX_PHP_VERSION}
       args:
         - BX_XDEBUG_IP=${BX_XDEBUG_IP}
         - BX_XDEBUG_PORT=${BX_XDEBUG_PORT}
