@@ -1,4 +1,4 @@
-FROM nginx
+FROM nginx:stable
 
 ARG CONTAINER_GID
 ARG CONTAINER_UID
