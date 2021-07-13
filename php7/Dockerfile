@@ -16,7 +16,7 @@ COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
 COPY ./exim/update-exim4.conf.conf /etc/exim4/
 
 RUN apt-get update \
-    && apt-get install -y vim exim4 \
+    && apt-get install -y vim exim4 libcurl4-openssl-dev \
     && echo "syntax on" > ~/.vimrc \
     && apt-get -y install \
         libmagickwand-dev \
@@ -35,7 +35,7 @@ RUN apt-get update \
     && docker-php-ext-enable memcached \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install mysqli pdo_mysql opcache exif intl sockets bz2 zip \
+    && docker-php-ext-install mysqli pdo_mysql opcache exif intl sockets bz2 zip curl \
     && docker-php-ext-configure opcache --enable-opcache \
 #    && pecl install -o -f redis \
 #    && docker-php-ext-enable redis \

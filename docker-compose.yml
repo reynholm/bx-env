@@ -110,6 +110,34 @@ services:
         aliases:
           - php-fpm
 
+  php-cli:
+    build:
+      context: ./php-cli
+      args:
+        - BX_XDEBUG_IP=${BX_XDEBUG_IP}
+        - BX_XDEBUG_PORT=${BX_XDEBUG_PORT}
+        - BX_DEFAULT_CHARSET=${BX_DEFAULT_CHARSET}
+        - CONTAINER_UID=${BX_CONTAINER_UID}
+        - CONTAINER_GID=${BX_CONTAINER_GID}
+        - CONTAINER_USER=bx
+        - CONTAINER_GROUP=bx
+    container_name: bx-php-cli
+    restart: always
+    environment:
+      - CONTAINER_UID=${BX_CONTAINER_UID}
+      - CONTAINER_GID=${BX_CONTAINER_GID}
+      - CONTAINER_USER=bx
+      - CONTAINER_GROUP=bx
+    volumes:
+      - bx-public:/var/www/public_html
+      - bx-modules:/media/bitrix/modules
+    extra_hosts:
+      - ${BX_UPDATE_HOST}
+    networks:
+      bx:
+        aliases:
+          - php-cli
+
   nginx:
     build:
       context: ./nginx
@@ -139,6 +167,10 @@ services:
       bx:
         aliases:
           - nginx
+          - b24.lan
+          - network.lan
+          - node1.b24.lan
+          - node2.b24.lan
 
 networks:
   bx:
