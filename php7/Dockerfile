@@ -40,7 +40,8 @@ RUN apt-get update \
 #    && pecl install -o -f redis \
 #    && docker-php-ext-enable redis \
     && rm -rf /tmp/* /var/cache/apk/* /var/lib/apt/lists/* \
-    && pecl install xdebug && docker-php-ext-enable xdebug
+    && pecl install xdebug && docker-php-ext-enable xdebug \
+    && pecl install memcache-4.0.5.2 && docker-php-ext-enable memcache
 
 RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} \
     && useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
