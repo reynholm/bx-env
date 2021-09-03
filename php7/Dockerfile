@@ -1,6 +1,7 @@
 FROM php:7.4-fpm
 
 ARG APCU_VERSION=5.1.20
+ARG MEMCACHE_VERSION=4.0.5.2
 
 ARG CONTAINER_GID
 ARG CONTAINER_UID
@@ -41,7 +42,7 @@ RUN apt-get update \
 #    && docker-php-ext-enable redis \
     && rm -rf /tmp/* /var/cache/apk/* /var/lib/apt/lists/* \
     && pecl install xdebug && docker-php-ext-enable xdebug \
-    && pecl install memcache-4.0.5.2 && docker-php-ext-enable memcache
+    && pecl install memcache-${MEMCACHE_VERSION} && docker-php-ext-enable memcache
 
 RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} \
     && useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
