@@ -140,6 +140,19 @@ services:
         aliases:
           - nginx
 
+  node:
+    build:
+      context: ./node
+    container_name: bx-node
+    restart: always
+    volumes:
+      - bx-public:/var/www/public_html
+      - bx-modules:/media/bitrix/modules
+    networks:
+      bx:
+        aliases:
+          - node
+
 networks:
   bx:
 
