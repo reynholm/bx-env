@@ -92,6 +92,8 @@ services:
         - CONTAINER_GID=${BX_CONTAINER_GID}
         - CONTAINER_USER=bx
         - CONTAINER_GROUP=bx
+        - BX_SMTP_PORT=${BX_SMTP_PORT}
+        - BX_SMTP_FROM=${BX_SMTP_FROM}
     container_name: bx-php-fpm
     restart: always
     environment:
@@ -99,6 +101,8 @@ services:
       - CONTAINER_GID=${BX_CONTAINER_GID}
       - CONTAINER_USER=bx
       - CONTAINER_GROUP=bx
+      - BX_SMTP_PORT=${BX_SMTP_PORT}
+      - BX_SMTP_FROM=${BX_SMTP_FROM}
     volumes:
       - ${BX_LOGS_PATH}/php-fpm:/var/log/php-fpm
       - bx-public:/var/www/public_html
@@ -152,6 +156,18 @@ services:
       bx:
         aliases:
           - node
+
+  fakesmtp:
+    image: gessnerfl/fake-smtp-server
+    container_name: bx-fakesmtp
+    networks:
+      bx:
+        aliases:
+          - fakesmtp
+    ports:
+      - ${BX_SMTP_WEB_PORT}:5080
+      - ${BX_SMTP_REST_PORT}:5081
+      - ${BX_SMTP_PORT}:5025
 
 networks:
   bx:
