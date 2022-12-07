@@ -160,6 +160,7 @@ services:
   fakesmtp:
     image: gessnerfl/fake-smtp-server
     container_name: bx-fakesmtp
+    restart: always
     networks:
       bx:
         aliases:
