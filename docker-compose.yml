@@ -114,6 +114,34 @@ services:
         aliases:
           - php-fpm
 
+  mkcert:
+    image: aegypius/mkcert-for-nginx-proxy
+    container_name: bx-mkcert
+    restart: unless-stopped
+    volumes:
+      - ssl-certs:/app/certs:rw
+      - ~/.pki/nssdb:/root/.pki/nssdb:rw
+      - ~/.mozilla/firefox:/root/.mozilla/firefox:rw
+      - ${CA_STORE:-/usr/local/share/ca-certificates}:/usr/local/share/ca-certificates
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: bx-proxy
+    labels:
+      com.github.aegypius.mkcert-for-nginx-proxy.nginx_proxy: ''
+    networks:
+      proxy: { }
+    ports:
+      - published: ${BX_HTTP_PORT}
+        target: 80
+      - published: ${BX_HTTPS_PORT}
+        target: 443
+    restart: unless-stopped
+    volumes:
+      - ssl-certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
   nginx:
     build:
       context: ./nginx
@@ -122,9 +150,8 @@ services:
         - CONTAINER_GID=${BX_CONTAINER_GID}
         - CONTAINER_USER=bx
         - CONTAINER_GROUP=bx
-    ports:
-      - ${BX_HTTP_PORT}:80
-      - ${BX_HTTPS_PORT}:443
+    expose:
+      - 80
     container_name: bx-nginx
     restart: always
     environment:
@@ -135,12 +162,17 @@ services:
       - CONTAINER_GID=${BX_CONTAINER_GID}
       - CONTAINER_USER=bx
       - CONTAINER_GROUP=bx
+      - VIRTUAL_HOST=b24.lan
+      - VIRTUAL_PORT=80
     volumes:
       - ${BX_LOGS_PATH}/nginx:/var/log/nginx
       - bx-public:/var/www/public_html
       - bx-modules:/media/bitrix/modules
     networks:
       bx:
+        aliases:
+          - nginx
+      proxy:
         aliases:
           - nginx
 
@@ -172,9 +204,12 @@ services:
 
 networks:
   bx:
+  proxy:
+    driver: bridge
 
 volumes:
   mysql_data:
+  ssl-certs:
   bx-modules:
     driver: local
     driver_opts:
