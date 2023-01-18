@@ -30,17 +30,22 @@ services:
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
-      - LISTEN_PORT=${BX_PUSH_SUB_PORT}
+      - LISTEN_PORT=80
       - SECURITY_KEY=${BX_PUSH_SECURITY_KEY}
       - MODE=sub
-    ports:
-      - ${BX_PUSH_SUB_PORT}:${BX_PUSH_SUB_PORT}
+      - VIRTUAL_HOST=${BX_PUSH_SUB_HOST}
+      - VIRTUAL_PORT=80
+    expose:
+      - 80
     labels:
-      - traefik.port=${BX_PUSH_SUB_PORT}
+      - traefik.port=80
       - traefik.protocol=http
       - traefik.frontend.rule=Host:${BX_PUSH_SUB_HOST}
     networks:
       bx:
+        aliases:
+          - ${BX_PUSH_SUB_HOST}
+      proxy:
         aliases:
           - ${BX_PUSH_SUB_HOST}
 
@@ -53,11 +58,18 @@ services:
     environment:
       - REDIS_HOST=redis
       - LISTEN_HOSTNAME=0.0.0.0
-      - LISTEN_PORT=${BX_PUSH_PUB_PORT}
+      - LISTEN_PORT=80
       - SECURITY_KEY=${BX_PUSH_SECURITY_KEY}
       - MODE=pub
+      - VIRTUAL_HOST=${BX_PUSH_PUB_HOST}
+      - VIRTUAL_PORT=80
+    expose:
+      - 80
     networks:
       bx:
+        aliases:
+          - ${BX_PUSH_PUB_HOST}
+      proxy:
         aliases:
           - ${BX_PUSH_PUB_HOST}
 
@@ -162,7 +174,7 @@ services:
       - CONTAINER_GID=${BX_CONTAINER_GID}
       - CONTAINER_USER=bx
       - CONTAINER_GROUP=bx
-      - VIRTUAL_HOST=b24.lan
+      - VIRTUAL_HOST=${BX_HTTPS_HOSTS}
       - VIRTUAL_PORT=80
     volumes:
       - ${BX_LOGS_PATH}/nginx:/var/log/nginx
