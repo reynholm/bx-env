@@ -14,10 +14,6 @@ ARG BX_DEFAULT_CHARSET
 ARG BX_SMTP_PORT
 ARG BX_SMTP_FROM
 
-COPY ./conf.d /usr/local/etc/php/conf.d/
-COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
-COPY ./msmtp /usr/local/etc/msmtp/
-
 RUN apt-get update \
     && apt-get install -y vim zip unzip default-mysql-client git msmtp \
     && echo "syntax on" > ~/.vimrc \
@@ -65,5 +61,9 @@ RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xd
     && sed -i "$ a mbstring.internal_encoding="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/mbstring.ini \
     && sed -i "$ a port "${BX_SMTP_PORT} /usr/local/etc/msmtp/msmtp.conf \
     && sed -i "$ a from "${BX_SMTP_FROM} /usr/local/etc/msmtp/msmtp.conf
+
+COPY ./conf.d /usr/local/etc/php/conf.d/
+COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
+COPY ./msmtp /usr/local/etc/msmtp/
 
 ENTRYPOINT php-fpm -F
