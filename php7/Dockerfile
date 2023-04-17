@@ -15,10 +15,6 @@ ARG BX_DEFAULT_CHARSET
 ARG BX_SMTP_PORT
 ARG BX_SMTP_FROM
 
-COPY ./conf.d /usr/local/etc/php/conf.d/
-COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
-COPY ./msmtp /usr/local/etc/msmtp/
-
 RUN apt-get update \
     && apt-get install -y vim msmtp \
     && echo "syntax on" > ~/.vimrc \
@@ -53,6 +49,10 @@ RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} \
 RUN chmod -R 777 /usr/local/etc/php/ \
     && chown -R ${CONTAINER_USER} /usr/local/etc/php/ \
     && curl -sS https://getcomposer.org/installer | php ; mv composer.phar /usr/bin/composer
+
+COPY ./msmtp /usr/local/etc/msmtp/
+COPY ./conf.d /usr/local/etc/php/conf.d/
+COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
 
 RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini \
     && sed -i "$ a xdebug.client_port="${BX_XDEBUG_PORT} /usr/local/etc/php/conf.d/xdebug.ini \
