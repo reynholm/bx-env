@@ -81,6 +81,24 @@ services:
         aliases:
           - mysql
 
+  postgre:
+    build:
+      context: ./postgres
+    container_name: bx-postgresql
+    restart: always
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${BX_PGSQL_USER}
+      - POSTGRES_PASSWORD=${BX_PGSQL_PASSWORD}
+      - POSTGRES_DB=${BX_PGSQL_DB}
+    ports:
+      - ${BX_PGSQL_PORT}:5432
+    networks:
+      bx:
+        aliases:
+          - pgsql
+
   php-fpm:
     build:
       context: ./php${BX_PHP_VERSION}
@@ -175,6 +193,7 @@ networks:
 
 volumes:
   mysql_data:
+  pgsql_data:
   bx-modules:
     driver: local
     driver_opts:
