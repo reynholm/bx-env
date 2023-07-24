@@ -5,6 +5,7 @@
 Сборка предназначена для разработки Битрикс и содержит контейнеры:
 - php
 - mysql
+- postgresql
 - nginx
 - redis
 - memcache
