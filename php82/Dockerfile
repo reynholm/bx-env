@@ -30,25 +30,42 @@ RUN apt-get update \
         libxml2-dev \
         libpq-dev \
         --no-install-recommends \
-    && pecl install apcu-${APCU_VERSION} \
-    && docker-php-ext-enable apcu \
-    && pecl install memcached \
-    && docker-php-ext-enable memcached \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install pgsql pdo_pgsql mysqli pdo_mysql opcache exif intl sockets bz2 zip \
     && docker-php-ext-configure opcache --enable-opcache \
-    && rm -rf /tmp/* /var/cache/apk/* /var/lib/apt/lists/* \
-    && pecl install xdebug && docker-php-ext-enable xdebug
+    && docker-php-source extract \
+    && mkdir -p /usr/src/php/ext/apcu \
+    && curl -fsSL https://github.com/krakjoe/apcu/archive/v$APCU_VERSION.tar.gz | tar xvz -C /usr/src/php/ext/apcu --strip 1 \
+    && docker-php-ext-install apcu \
+    && docker-php-source delete \
+    && rm -rf /tmp/* /var/cache/apk/* /var/lib/apt/lists/*
 
 RUN cd /tmp && \
+    # imagick
     git clone https://github.com/Imagick/imagick && \
     cd imagick && \
     phpize && \
     ./configure && \
     make && make install && \
     docker-php-ext-enable imagick && \
-    cd /tmp && rm -rf imagick
+    cd /tmp && rm -rf imagick && \
+    # memcached
+    git clone https://github.com/php-memcached-dev/php-memcached && \
+    cd php-memcached && \
+    phpize && \
+    ./configure && \
+    make && make install && \
+    docker-php-ext-enable memcached && \
+    cd /tmp && rm -rf php-memcached && \
+    # xdebug
+    git clone -b xdebug_3_2 https://github.com/xdebug/xdebug.git && \
+    cd xdebug && \
+    phpize && \
+    ./configure && \
+    make && make install && \
+    docker-php-ext-enable xdebug && \
+    cd /tmp && rm -rf xdebug
 
 RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} && \
     useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
