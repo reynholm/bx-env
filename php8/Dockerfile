@@ -87,7 +87,6 @@ RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xd
 
  # PHPUnit
 RUN mkdir /var/composer && \
-    mkdir /var/config && \
     cd /var/composer && \
     composer require "phpunit/phpunit:^9" \
     --no-interaction \

@@ -133,4 +133,4 @@
 В контейнере php-fpm установлен пакет PHPUnit. <br>
 Файл phpunit.xml создается на хост машине <br>
 Путь к phpunit.phar: /var/composer/vendor/bin/phpunit <br>
-Путь к bootsrap: /media/bitrix/modules/bxtest/tests/.bootstrap.php
+Путь к bootstrap: /media/bitrix/modules/bxtest/tests/.bootstrap.php
