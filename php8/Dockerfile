@@ -85,4 +85,14 @@ RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xd
     && sed -i "$ a port "${BX_SMTP_PORT} /usr/local/etc/msmtp/msmtp.conf \
     && sed -i "$ a from "${BX_SMTP_FROM} /usr/local/etc/msmtp/msmtp.conf
 
+ # PHPUnit
+RUN mkdir /var/composer && \
+    mkdir /var/config && \
+    cd /var/composer && \
+    composer require "phpunit/phpunit:^9" \
+    --no-interaction \
+    --no-plugins \
+    --no-scripts \
+    --prefer-dist
+
 ENTRYPOINT php-fpm -F
