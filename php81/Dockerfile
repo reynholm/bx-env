@@ -2,17 +2,6 @@ FROM php:8.1-fpm
 
 ARG APCU_VERSION=5.1.22
 
-ARG CONTAINER_GID
-ARG CONTAINER_UID
-ARG CONTAINER_USER
-ARG CONTAINER_GROUP
-
-ARG BX_XDEBUG_IP
-ARG BX_XDEBUG_PORT
-ARG BX_DEFAULT_CHARSET
-
-ARG BX_SMTP_PORT
-ARG BX_SMTP_FROM
 
 RUN apt-get update \
     && apt-get install -y vim zip unzip default-mysql-client git msmtp \
@@ -67,6 +56,12 @@ RUN cd /tmp && \
     docker-php-ext-enable xdebug && \
     cd /tmp && rm -rf xdebug
 
+
+ARG CONTAINER_GID
+ARG CONTAINER_UID
+ARG CONTAINER_USER
+ARG CONTAINER_GROUP
+
 RUN groupadd -g ${CONTAINER_GID} ${CONTAINER_GROUP} && \
     useradd -u ${CONTAINER_UID} -g ${CONTAINER_GID} ${CONTAINER_USER}
 
@@ -77,6 +72,14 @@ RUN chmod -R 777 /usr/local/etc/php/ \
 COPY ./conf.d /usr/local/etc/php/conf.d/
 COPY ./php-fpm.d /usr/local/etc/php-fpm.d/
 COPY ./msmtp /usr/local/etc/msmtp/
+
+
+ARG BX_XDEBUG_IP
+ARG BX_XDEBUG_PORT
+ARG BX_DEFAULT_CHARSET
+
+ARG BX_SMTP_PORT
+ARG BX_SMTP_FROM
 
 RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xdebug.ini \
     && sed -i "$ a xdebug.client_port="${BX_XDEBUG_PORT} /usr/local/etc/php/conf.d/xdebug.ini \
