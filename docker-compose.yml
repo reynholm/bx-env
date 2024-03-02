@@ -188,6 +188,7 @@ services:
       - ${BX_SMTP_REST_PORT}:8081
       - ${BX_SMTP_PORT}:8025
 
+
 networks:
   bx:
 
