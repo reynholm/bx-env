@@ -82,7 +82,6 @@ RUN sed -i "$ a xdebug.client_host="${BX_XDEBUG_IP} /usr/local/etc/php/conf.d/xd
     && sed -i "$ a xdebug.client_port="${BX_XDEBUG_PORT} /usr/local/etc/php/conf.d/xdebug.ini \
     && sed -i "$ a default_charset="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/php.ini \
     && sed -i "$ a mbstring.internal_encoding="${BX_DEFAULT_CHARSET} /usr/local/etc/php/conf.d/mbstring.ini \
-    && sed -i "$ a port "${BX_SMTP_PORT} /usr/local/etc/msmtp/msmtp.conf \
     && sed -i "$ a from "${BX_SMTP_FROM} /usr/local/etc/msmtp/msmtp.conf
 
  # PHPUnit
