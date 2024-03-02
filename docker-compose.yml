@@ -187,6 +187,10 @@ services:
       - ${BX_SMTP_WEB_PORT}:5080
       - ${BX_SMTP_REST_PORT}:5081
       - ${BX_SMTP_PORT}:5025
+    environment:
+      - SERVER_PORT=5080
+      - MANAGEMENT_SERVER_PORT=5081
+      - FAKESMTP_PORT=5025
 
 networks:
   bx:
